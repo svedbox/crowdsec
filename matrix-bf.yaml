@@ -1,13 +1,14 @@
-#/etc/crowdsec/scenarios/matrix-bf.yaml
+---
 type: leaky
 name: crowdsecurity/matrix-bf
-description: "Detect Matrix bruteforce"
-filter: "evt.Meta.response_code == '403'"
-leakspeed: "10m"
-capacity: 2
-groupby: evt.Meta.source_ip + '--' + evt.Meta.log_type
+description: "Detect Matrix bruteforce attempts (HTTP 403)"
+filter: "evt.Meta.log_type == '403'"
+leakspeed: 10m
+capacity: 3
+groupby: evt.Meta.source_ip
 blackhole: 1m
 reprocess: true
+
 labels:
   remediation: true
   confidence: 3
