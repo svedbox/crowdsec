@@ -1,40 +1,25 @@
-# /etc/crowdsec/parsers/s01-parse/matrix-logs.yaml 
 ---
-onsuccess: next_stage
-#filter: "Upper(evt.Parsed.program) == 'MATRIX'"
 name: crowdsecurity/matrix-logs
-description: "Parse matrix logs"
+description: "Parse Matrix HTTP access logs"
 debug: true
+stage: s01-parse
+onsuccess: next_stage
+
 nodes:
   - grok:
       pattern: '%{IP:source_ip} - - \[%{DATA:timestamp}\] "(?:%{WORD:method} %{URIPATHPARAM:request}(?: HTTP/%{NUMBER:http_version})?)" %{NUMBER:response_code} %{NUMBER:bytes} "(?:%{DATA:referrer})" "%{DATA:user_agent}"'
       apply_on: message
+
   - statics:
       - meta: source_ip
-        value: evt.Parsed.source_ip
+        expression: evt.Parsed.source_ip
       - meta: response_code
-        value: evt.Parsed.response_code
+        expression: evt.Parsed.response_code
       - meta: method
-        value: evt.Parsed.method
+        expression: evt.Parsed.method
       - meta: user_agent
-        value: evt.Parsed.user_agent
+        expression: evt.Parsed.user_agent
+      - meta: log_type
+        expression: |
+          evt.Parsed.response_code == "403" ? "403" : "ok"
 
-
-
-#    statics:
-#      - meta: response_code
-#        expression: "evt.Parsed.response_code"
-#      - meta: log_type
-#        expression: "evt.Parsed.response_code"
-#      - meta: log_type
-#        value: matrix
-
-#statics:
-#  - meta: type
-#    value: matrix
-#  - meta: service
-#    value: matrix
-#  - meta: source_ip
-#    expression: "evt.Parsed.source_ip"
-#  - target: evt.StrTime
-#    expression: "evt.Parsed.timestamp"
