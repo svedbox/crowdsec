@@ -1,0 +1,19 @@
+#/etc/crowdsec/scenarios/matrix-bf.yaml
+type: leaky
+name: crowdsecurity/matrix-bf
+description: "Detect Matrix bruteforce"
+filter: "evt.Meta.response_code == '403'"
+leakspeed: "10m"
+capacity: 2
+groupby: evt.Meta.source_ip + '--' + evt.Meta.log_type
+blackhole: 1m
+reprocess: true
+labels:
+  remediation: true
+  confidence: 3
+  spoofable: 0
+  classification:
+    - attack.T1110
+  behavior: "http:bruteforce"
+  label: "Matrix Bruteforce"
+  service: matrix
